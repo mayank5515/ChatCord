@@ -14,32 +14,29 @@ const io = socket(server);
 //Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
-//run when client connects
+//RUN WHEN CLIENT CONNECTS
 // eslint-disable-next-line no-shadow
 io.on("connection", (socket) => {
-  //   console.log("New WS connection....");
-  //we want to send or emit messages(or events) back and forth
-  //emit message to client from server
+  //console.log("New WS connection....");
+  //we want to send or emit messages(or events) back and forth ,emit message to client from server
   //EMIT MESSAGE TO (ONLY) CLIENT THAT CONNECTS
   socket.emit("message", "Welcome to ChatCord");
-
   //BROADCAST WHEN A USER CONNECTS (ONLY USER WONT BE BROADCASTED TO)
   socket.broadcast.emit("message", "A user has joined the chat");
-
   //RUN WHEN USER DISCONNECTS
   socket.on("disconnect", () => {
     //BROADCAST TO EVERYONE
     io.emit("message", "A user has left the chat");
   });
 
-  //LISTEN TO CHAT MESSAGE
+  //LISTEN TO CHAT MESSAGE FROM CLIENT
   socket.on("chatMessage", (message) => {
     //EMIT THIS MESSAGE BACK TO CLIENT (WHY? WELL U WANNA SEE YOUR OWN MESSAGE RIGHT ? AND EVERYONE SHOULD SEE IT TOO)
-    //ARE WE BROADCASTING IT
     io.emit("message", message);
-    // console.log("from server", message);
   });
 });
+
+//LISTENING TO SERVER
 const port = 4000 || process.env.PORT;
 server.listen(port, () => {
   console.log(`Listening to server on port ${port}`);
