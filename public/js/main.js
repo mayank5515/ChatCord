@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 const socket = io();
 const chatForm = document.getElementById("chat-form");
+const chatMessages = document.querySelector(".chat-messages");
 
 //OUTPUT MESSAGE TO DOM
 function outputMessage(message) {
@@ -15,6 +16,9 @@ function outputMessage(message) {
 socket.on("message", (message) => {
   console.log("from client", message);
   outputMessage(message);
+
+  //SCROLL TO BOTTOM
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
 //HANDLE MESSAGE SUBMITION
@@ -25,4 +29,8 @@ chatForm.addEventListener("submit", (e) => {
   //   console.log(msg);
   //EMIT CHAT MESSAGE TO SERVER (AND SEND MSG AS PAYLOAD)
   socket.emit("chatMessage", msg);
+
+  //CLEAR INPUT
+  e.target.elements.msg.value = "";
+  e.target.elements.msg.focus();
 });

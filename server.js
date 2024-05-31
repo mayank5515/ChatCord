@@ -3,10 +3,12 @@ const path = require("path");
 const http = require("http");
 const dotenv = require("dotenv");
 const socket = require("socket.io");
+const formatMessage = require("./utils/messages");
 
 dotenv.config({
   path: "./config.env",
 });
+const botName = "ChatCord Bot";
 const app = express();
 const server = http.createServer(app); //as express handles server under hood but we need server to pass this to socket.io
 const io = socket(server);
@@ -20,19 +22,22 @@ io.on("connection", (socket) => {
   //console.log("New WS connection....");
   //we want to send or emit messages(or events) back and forth ,emit message to client from server
   //EMIT MESSAGE TO (ONLY) CLIENT THAT CONNECTS
-  socket.emit("message", "Welcome to ChatCord");
+  socket.emit("message", formatMessage(botName, "Welcome to ChatCord"));
   //BROADCAST WHEN A USER CONNECTS (ONLY USER WONT BE BROADCASTED TO)
-  socket.broadcast.emit("message", "A user has joined the chat");
+  socket.broadcast.emit(
+    "message",
+    formatMessage(botName, `A user has joined the chat`)
+  );
   //RUN WHEN USER DISCONNECTS
   socket.on("disconnect", () => {
     //BROADCAST TO EVERYONE
-    io.emit("message", "A user has left the chat");
+    io.emit("message", formatMessage(botName, `A user has left the chat`));
   });
 
   //LISTEN TO CHAT MESSAGE FROM CLIENT
   socket.on("chatMessage", (message) => {
     //EMIT THIS MESSAGE BACK TO CLIENT (WHY? WELL U WANNA SEE YOUR OWN MESSAGE RIGHT ? AND EVERYONE SHOULD SEE IT TOO)
-    io.emit("message", message);
+    io.emit("message", formatMessage("USER", message));
   });
 });
 
